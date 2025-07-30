@@ -18,6 +18,7 @@ db.serialize(() => {
     id TEXT PRIMARY KEY,
     team1_name TEXT NOT NULL,
     team2_name TEXT NOT NULL,
+    possession TEXT NOT NULL,
     start_time DATETIME DEFAULT CURRENT_TIMESTAMP,
     end_time DATETIME,
     status TEXT DEFAULT 'active'
@@ -52,12 +53,12 @@ app.get('/', (req, res) => {
 
 // Game endpoints
 app.post('/api/games', (req, res) => {
-  const { team1_name, team2_name, players } = req.body;
+  const { team1_name, team2_name, players, initial_possession } = req.body;
   const gameId = uuidv4();
   
   db.run(
-    'INSERT INTO games (id, team1_name, team2_name) VALUES (?, ?, ?)',
-    [gameId, team1_name, team2_name],
+    'INSERT INTO games (id, team1_name, team2_name, possession) VALUES (?, ?, ?, ?)',
+    [gameId, team1_name, team2_name, initial_possession || team1_name],
     function(err) {
       if (err) {
         return res.status(500).json({ error: err.message });
@@ -84,6 +85,7 @@ app.post('/api/games', (req, res) => {
             id: gameId, 
             team1_name, 
             team2_name, 
+            possession: initial_possession || team1_name,
             players: insertedPlayers,
             status: 'active'
           });
@@ -125,9 +127,27 @@ app.get('/api/games/:id', (req, res) => {
   );
 });
 
+// Possession update endpoint
+app.put('/api/games/:id/possession', (req, res) => {
+  const gameId = req.params.id;
+  const { possession } = req.body;
+  
+  db.run(
+    'UPDATE games SET possession = ? WHERE id = ?',
+    [possession, gameId],
+    function(err) {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      
+      res.json({ gameId, possession });
+    }
+  );
+});
+
 // Event endpoints
 app.post('/api/events', (req, res) => {
-  const { game_id, player_id, event_type, sub_type, result, game_time } = req.body;
+  const { game_id, player_id, event_type, sub_type, result, game_time, new_possession } = req.body;
   const eventId = uuidv4();
   
   db.run(
@@ -138,6 +158,19 @@ app.post('/api/events', (req, res) => {
         return res.status(500).json({ error: err.message });
       }
       
+      // Update possession if specified
+      if (new_possession) {
+        db.run(
+          'UPDATE games SET possession = ? WHERE id = ?',
+          [new_possession, game_id],
+          (possessionErr) => {
+            if (possessionErr) {
+              console.error('Error updating possession:', possessionErr);
+            }
+          }
+        );
+      }
+      
       res.json({ 
         id: eventId, 
         game_id, 
@@ -145,7 +178,8 @@ app.post('/api/events', (req, res) => {
         event_type, 
         sub_type, 
         result, 
-        game_time 
+        game_time,
+        new_possession 
       });
     }
   );

@@ -14,6 +14,7 @@ interface Game {
   id: string;
   team1_name: string;
   team2_name: string;
+  possession: string;
   players: Player[];
   status: string;
 }
@@ -39,6 +40,7 @@ const GameTracker: React.FC<GameTrackerProps> = ({ game }) => {
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [events, setEvents] = useState<Event[]>([]);
   const [gameTime, setGameTime] = useState(0);
+  const [currentPossession, setCurrentPossession] = useState(game.possession);
 
   const team1Players = game.players.filter(p => p.team === game.team1_name);
   const team2Players = game.players.filter(p => p.team === game.team2_name);
@@ -80,7 +82,7 @@ const GameTracker: React.FC<GameTrackerProps> = ({ game }) => {
     setSelectedPlayer(player);
   };
 
-  const handleEventLog = async (eventType: string, subType?: string, result?: string, playerId?: string) => {
+  const handleEventLog = async (eventType: string, subType?: string, result?: string, playerId?: string, newPossession?: string) => {
     if (!selectedPlayer && !playerId) return;
 
     const eventData = {
@@ -89,7 +91,8 @@ const GameTracker: React.FC<GameTrackerProps> = ({ game }) => {
       event_type: eventType,
       sub_type: subType,
       result: result,
-      game_time: gameTime
+      game_time: gameTime,
+      new_possession: newPossession
     };
 
     try {
@@ -102,6 +105,10 @@ const GameTracker: React.FC<GameTrackerProps> = ({ game }) => {
       });
 
       if (response.ok) {
+        // Update possession if it changed
+        if (newPossession && newPossession !== currentPossession) {
+          setCurrentPossession(newPossession);
+        }
         // Refresh events list
         fetchEvents();
         setSelectedPlayer(null);
@@ -123,12 +130,15 @@ const GameTracker: React.FC<GameTrackerProps> = ({ game }) => {
           <span>{game.team1_name}: {score[game.team1_name]}</span>
           <span>{game.team2_name}: {score[game.team2_name]}</span>
         </div>
+        <div className="possession-indicator">
+          <span>🏀 Possession: <strong>{currentPossession}</strong></span>
+        </div>
         <GameTimer gameTime={gameTime} setGameTime={setGameTime} />
       </div>
 
       <div className="game-content">
         <div className="teams-container">
-          <div className="team-section">
+          <div className={`team-section ${currentPossession !== game.team1_name ? 'no-possession' : ''}`}>
             <h3>{game.team1_name}</h3>
             <div className="players-grid">
               {team1Players.map(player => (
@@ -136,6 +146,7 @@ const GameTracker: React.FC<GameTrackerProps> = ({ game }) => {
                   key={player.id}
                   className={`player-btn ${selectedPlayer?.id === player.id ? 'selected' : ''}`}
                   onClick={() => handlePlayerSelect(player)}
+                  disabled={currentPossession !== game.team1_name}
                 >
                   {player.name}
                 </button>
@@ -143,7 +154,7 @@ const GameTracker: React.FC<GameTrackerProps> = ({ game }) => {
             </div>
           </div>
 
-          <div className="team-section">
+          <div className={`team-section ${currentPossession !== game.team2_name ? 'no-possession' : ''}`}>
             <h3>{game.team2_name}</h3>
             <div className="players-grid">
               {team2Players.map(player => (
@@ -151,6 +162,7 @@ const GameTracker: React.FC<GameTrackerProps> = ({ game }) => {
                   key={player.id}
                   className={`player-btn ${selectedPlayer?.id === player.id ? 'selected' : ''}`}
                   onClick={() => handlePlayerSelect(player)}
+                  disabled={currentPossession !== game.team2_name}
                 >
                   {player.name}
                 </button>
@@ -168,6 +180,7 @@ const GameTracker: React.FC<GameTrackerProps> = ({ game }) => {
         <PlayerActions
           player={selectedPlayer}
           allPlayers={game.players}
+          currentPossession={currentPossession}
           onEventLog={handleEventLog}
           onClose={handleCloseActions}
         />

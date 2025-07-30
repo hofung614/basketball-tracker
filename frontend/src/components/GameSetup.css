@@ -81,6 +81,58 @@
   margin: 0 1rem;
 }
 
+.possession-setup {
+  margin: 30px 0;
+  text-align: center;
+}
+
+.possession-setup h3 {
+  color: #333;
+  margin-bottom: 15px;
+  font-size: 1.3rem;
+}
+
+.possession-options {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+}
+
+.possession-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.possession-option:hover {
+  border-color: #4CAF50;
+  background: #f8fff8;
+}
+
+.possession-option input[type="radio"] {
+  margin: 0;
+  cursor: pointer;
+  transform: scale(1.2);
+}
+
+.possession-option input[type="radio"]:checked + span {
+  color: #4CAF50;
+  font-weight: bold;
+}
+
+.possession-option span {
+  font-size: 16px;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
 .start-game-btn {
   display: block;
   margin: 0 auto;

@@ -33,6 +33,24 @@
   text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
 }
 
+.possession-indicator {
+  background: linear-gradient(45deg, #FF6B35, #FF8C42);
+  padding: 0.8rem 1.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(255, 107, 53, 0.3);
+}
+
+.possession-indicator span {
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 500;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.possession-indicator strong {
+  font-weight: bold;
+}
+
 .game-header h2 {
   color: #333;
   margin: 0;
@@ -53,6 +71,11 @@
 
 .team-section {
   flex: 1;
+  transition: opacity 0.3s ease;
+}
+
+.team-section.no-possession {
+  opacity: 0.4;
 }
 
 .team-section h3 {
@@ -98,6 +121,19 @@
   background: linear-gradient(45deg, #FF9800, #F57C00);
   box-shadow: 0 6px 20px rgba(255, 152, 0, 0.4);
   transform: translateY(-2px);
+}
+
+.player-btn:disabled {
+  background: linear-gradient(45deg, #ccc, #aaa);
+  cursor: not-allowed;
+  opacity: 0.6;
+  transform: none;
+  box-shadow: none;
+}
+
+.player-btn:disabled:hover {
+  transform: none;
+  box-shadow: none;
 }
 
 .events-section {

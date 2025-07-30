@@ -10,7 +10,8 @@ interface Player {
 interface PlayerActionsProps {
   player: Player;
   allPlayers: Player[];
-  onEventLog: (eventType: string, subType?: string, result?: string, playerId?: string) => void;
+  currentPossession: string;
+  onEventLog: (eventType: string, subType?: string, result?: string, playerId?: string, newPossession?: string) => void;
   onClose: () => void;
 }
 
@@ -19,7 +20,7 @@ interface NextAction {
   shotType?: '2pt' | '3pt';
 }
 
-const PlayerActions: React.FC<PlayerActionsProps> = ({ player, allPlayers, onEventLog, onClose }) => {
+const PlayerActions: React.FC<PlayerActionsProps> = ({ player, allPlayers, currentPossession, onEventLog, onClose }) => {
   const [nextAction, setNextAction] = useState<NextAction | null>(null);
   
   // Get opponents (other team players)
@@ -33,17 +34,26 @@ const PlayerActions: React.FC<PlayerActionsProps> = ({ player, allPlayers, onEve
     console.log(`${new Date().toISOString()}: ${player.name} ${shotType} shot ${result}${rebounderId ? `, rebound by ${rebounderId}` : ''}`);
     
     if (result === 'make') {
-      onEventLog('shot', shotType, result);
+      // Made shot - possession changes to other team
+      const otherTeam = player.team === currentPossession ? 
+        allPlayers.find(p => p.team !== player.team)?.team || '' : player.team;
+      onEventLog('shot', shotType, result, undefined, otherTeam);
     } else {
       // Log the missed shot
       onEventLog('shot', shotType, result);
+      
       // Log the rebound if specified
       if (rebounderId && rebounderId !== 'out-of-bounds') {
         const rebounder = allPlayers.find(p => p.id === rebounderId);
-        console.log(`${new Date().toISOString()}: Rebound by ${rebounder?.name}`);
-        onEventLog('rebound', undefined, undefined, rebounderId);
+        const reboundType = rebounder?.team === player.team ? 'offensive' : 'defensive';
+        console.log(`${new Date().toISOString()}: ${reboundType} rebound by ${rebounder?.name}`);
+        
+        // Possession changes on defensive rebound
+        const newPossession = reboundType === 'defensive' ? rebounder?.team : currentPossession;
+        onEventLog('rebound', reboundType, undefined, rebounderId, newPossession);
       } else if (rebounderId === 'out-of-bounds') {
         console.log(`${new Date().toISOString()}: Ball out of bounds`);
+        // For now, assume possession doesn't change on out of bounds
         onEventLog('out-of-bounds');
       }
     }
@@ -58,10 +68,14 @@ const PlayerActions: React.FC<PlayerActionsProps> = ({ player, allPlayers, onEve
     if (stealerId) {
       const stealer = allPlayers.find(p => p.id === stealerId);
       console.log(`${new Date().toISOString()}: ${player.name} turnover, steal by ${stealer?.name}`);
-      onEventLog('steal', undefined, undefined, stealerId);
+      // Log both turnover and steal, possession goes to stealer's team
+      onEventLog('turnover', undefined, undefined, undefined, stealer?.team);
+      onEventLog('steal', undefined, undefined, stealerId, stealer?.team);
     } else {
       console.log(`${new Date().toISOString()}: ${player.name} normal turnover`);
-      onEventLog('turnover');
+      // Normal turnover - possession goes to other team
+      const otherTeam = allPlayers.find(p => p.team !== player.team)?.team || '';
+      onEventLog('turnover', undefined, undefined, undefined, otherTeam);
     }
     onClose();
   };

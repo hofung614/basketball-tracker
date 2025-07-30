@@ -11,6 +11,7 @@ interface Game {
   id: string;
   team1_name: string;
   team2_name: string;
+  possession: string;
   players: Player[];
   status: string;
 }
@@ -28,6 +29,7 @@ const GameSetup: React.FC<GameSetupProps> = ({ onGameStart }) => {
   const [team2Players, setTeam2Players] = useState([
     'Player 6', 'Player 7', 'Player 8', 'Player 9', 'Player 10'
   ]);
+  const [initialPossession, setInitialPossession] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handlePlayerNameChange = (team: number, index: number, name: string) => {
@@ -50,6 +52,8 @@ const GameSetup: React.FC<GameSetupProps> = ({ onGameStart }) => {
       ...team2Players.map(name => ({ name, team: team2Name }))
     ];
 
+    const possessionTeam = initialPossession || team1Name;
+
     try {
       const response = await fetch('http://localhost:3001/api/games', {
         method: 'POST',
@@ -59,7 +63,8 @@ const GameSetup: React.FC<GameSetupProps> = ({ onGameStart }) => {
         body: JSON.stringify({
           team1_name: team1Name,
           team2_name: team2Name,
-          players: players
+          players: players,
+          initial_possession: possessionTeam
         }),
       });
 
@@ -127,6 +132,32 @@ const GameSetup: React.FC<GameSetupProps> = ({ onGameStart }) => {
               />
             ))}
           </div>
+        </div>
+      </div>
+
+      <div className="possession-setup">
+        <h3>Who starts with the ball?</h3>
+        <div className="possession-options">
+          <label className="possession-option">
+            <input
+              type="radio"
+              name="initialPossession"
+              value={team1Name}
+              checked={initialPossession === team1Name}
+              onChange={(e) => setInitialPossession(e.target.value)}
+            />
+            <span>{team1Name}</span>
+          </label>
+          <label className="possession-option">
+            <input
+              type="radio"
+              name="initialPossession"
+              value={team2Name}
+              checked={initialPossession === team2Name}
+              onChange={(e) => setInitialPossession(e.target.value)}
+            />
+            <span>{team2Name}</span>
+          </label>
         </div>
       </div>
 

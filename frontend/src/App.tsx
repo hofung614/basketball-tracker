@@ -13,6 +13,7 @@ interface Game {
   id: string;
   team1_name: string;
   team2_name: string;
+  possession: string;
   players: Player[];
   status: string;
 }

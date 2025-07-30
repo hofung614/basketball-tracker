@@ -49,6 +49,21 @@ const GameTracker: React.FC<GameTrackerProps> = ({ game }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [game.id]);
 
+  const [score, setScore] = useState<{ [key: string]: number }>({
+    [game.team1_name]: 0,
+    [game.team2_name]: 0,
+  });
+
+  useEffect(() => {
+    const updatedScore = events.reduce((acc, event) => {
+      if (event.event_type === 'shot' && event.result === 'make') {
+        acc[event.player_team] += event.sub_type === '2pt' ? 2 : 3;
+      }
+      return acc;
+    }, { [game.team1_name]: 0, [game.team2_name]: 0 });
+    setScore(updatedScore);
+  }, [events, game.team1_name, game.team2_name]);
+
   const fetchEvents = async () => {
     try {
       const response = await fetch(`http://localhost:3001/api/games/${game.id}/events`);
@@ -65,22 +80,7 @@ const GameTracker: React.FC<GameTrackerProps> = ({ game }) => {
     setSelectedPlayer(player);
   };
 
-  const [score, setScore] = useState<{ [key: string]: number }>({
-    [game.team1_name]: 0,
-    [game.team2_name]: 0,
-  });
-
-  useEffect(() => {
-    const updatedScore = events.reduce((acc, event) => {
-      if (event.event_type === 'shot' && event.result === 'make') {
-        acc[event.player_team] += event.sub_type === '2pt' ? 2 : 3;
-      }
-      return acc;
-    }, { [game.team1_name]: 0, [game.team2_name]: 0 });
-    setScore(updatedScore);
-  }, [events, game.team1_name, game.team2_name]);
-
-  const handleEventLog = async (eventType: string, subType?: string, result?: string, playerId?: string) => {
+  const handleEventLog = async (eventType: string, subType?: string, result?: string, playerId?: string) => {
     if (!selectedPlayer && !playerId) return;
 
     const eventData = {
@@ -119,11 +119,11 @@ const GameTracker: React.FC<GameTrackerProps> = ({ game }) => {
     <div className="game-tracker">
       <div className="game-header">
         <h2>{game.team1_name} vs {game.team2_name}</h2>
-        <div className="scoreboard">
+        <div className="scoreboard">
           <span>{game.team1_name}: {score[game.team1_name]}</span>
           <span>{game.team2_name}: {score[game.team2_name]}</span>
-        </div>
-        <GameTimer gameTime={gameTime} setGameTime={setGameTime} />
+        </div>
+        <GameTimer gameTime={gameTime} setGameTime={setGameTime} />
       </div>
 
       <div className="game-content">

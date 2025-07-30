@@ -7,7 +7,7 @@ interface GameTimerProps {
 }
 
 const GameTimer: React.FC<GameTimerProps> = ({ gameTime, setGameTime }) => {
-  const [isRunning, setIsRunning] = useState(false);
+  const [isRunning, setIsRunning] = useState(true); // Auto-start the timer
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {

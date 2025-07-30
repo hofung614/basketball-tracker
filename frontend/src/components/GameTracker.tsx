@@ -51,7 +51,7 @@ const GameTracker: React.FC<GameTrackerProps> = ({ game }) => {
 
   const fetchEvents = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/games/${game.id}/events`);
+      const response = await fetch(`http://localhost:3001/api/games/${game.id}/events`);
       if (response.ok) {
         const eventsData = await response.json();
         setEvents(eventsData);
@@ -65,12 +65,12 @@ const GameTracker: React.FC<GameTrackerProps> = ({ game }) => {
     setSelectedPlayer(player);
   };
 
-  const handleEventLog = async (eventType: string, subType?: string, result?: string) => {
-    if (!selectedPlayer) return;
+  const handleEventLog = async (eventType: string, subType?: string, result?: string, playerId?: string) => {
+    if (!selectedPlayer && !playerId) return;
 
     const eventData = {
       game_id: game.id,
-      player_id: selectedPlayer.id,
+      player_id: playerId || selectedPlayer!.id,
       event_type: eventType,
       sub_type: subType,
       result: result,
@@ -78,7 +78,7 @@ const GameTracker: React.FC<GameTrackerProps> = ({ game }) => {
     };
 
     try {
-      const response = await fetch('http://localhost:5000/api/events', {
+      const response = await fetch('http://localhost:3001/api/events', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -148,6 +148,7 @@ const GameTracker: React.FC<GameTrackerProps> = ({ game }) => {
       {selectedPlayer && (
         <PlayerActions
           player={selectedPlayer}
+          allPlayers={game.players}
           onEventLog={handleEventLog}
           onClose={handleCloseActions}
         />

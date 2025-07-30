@@ -89,28 +89,104 @@
   font-size: 1.1rem;
 }
 
-.make-btn, .miss-btn, .rebound-btn, .steal-btn, .turnover-btn {
-  background: #ff9800;
+.initial-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.action-btn {
+  background: #2196F3;
   color: white;
   border: none;
-  border-radius: 20px;
-  padding: 0.6rem 1.2rem;
-  font-size: 0.9rem;
+  border-radius: 12px;
+  padding: 1rem 2rem;
+  font-size: 1.1rem;
+  font-weight: bold;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(33, 150, 243, 0.3);
 }
 
-.make-btn:hover, .miss-btn:hover, .rebound-btn:hover, .steal-btn:hover, .turnover-btn:hover {
-  background: #f57c00;
+.action-btn:hover {
+  background: #1976D2;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(33, 150, 243, 0.4);
 }
 
-.other-actions {
+.shot-result-buttons {
   display: flex;
-  justify-content: space-around;
-  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
 }
 
-.other-actions button {
-  margin-bottom: 0.5rem;
+.make-btn, .miss-btn {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  flex: 1;
+}
+
+.miss-btn {
+  background: #f44336;
+}
+
+.make-btn:hover {
+  background: #45a049;
+  transform: translateY(-2px);
+}
+
+.miss-btn:hover {
+  background: #d32f2f;
+  transform: translateY(-2px);
+}
+
+.rebound-options, .turnover-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.player-option-btn {
+  background: #FF9800;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+}
+
+.player-option-btn:hover {
+  background: #F57C00;
+  transform: translateY(-1px);
+}
+
+.out-of-bounds-btn {
+  background: #9E9E9E !important;
+}
+
+.out-of-bounds-btn:hover {
+  background: #757575 !important;
+}
+
+.normal-turnover-btn {
+  background: #607D8B !important;
+}
+
+.normal-turnover-btn:hover {
+  background: #455A64 !important;
 }
 

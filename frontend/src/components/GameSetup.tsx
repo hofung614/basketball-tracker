@@ -51,7 +51,7 @@ const GameSetup: React.FC<GameSetupProps> = ({ onGameStart }) => {
     ];
 
     try {
-      const response = await fetch('http://localhost:5000/api/games', {
+      const response = await fetch('http://localhost:3001/api/games', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
